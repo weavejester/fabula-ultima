@@ -227,13 +227,13 @@ export class FabulaUltimaActor extends Actor {
   }
 
   getWeaponTotalDamage(weapon) {
-    let baseDamage = weapon.data.data.damage.bonus;
-    const isMelee = weapon.data.data.type === "melee";
+    let baseDamage = weapon.system.damage.bonus;
+    const isMelee = weapon.system.type === "melee";
 
     const features = this.items.filter(i => i.type === "feature");
     for (const feature of features) {
-      const bonus = Number(isMelee ? feature.data.data.passive.meleeDamageBonus : feature.data.data.passive.rangedDamageBonus);
-      const level = Number(feature.data.data.level);
+      const bonus = Number(isMelee ? feature.system.passive.meleeDamageBonus : feature.system.passive.rangedDamageBonus);
+      const level = Number(feature.system.level);
       if (isNaN(bonus) || isNaN(level)) continue;
       if (!this.checkFeatureCondition(feature)) continue;
 
@@ -251,20 +251,21 @@ export class FabulaUltimaActor extends Actor {
   }
 
   getWeaponFormula(item) {
-    let weaponBonus = item.data.precisionBonus;
-    const isMelee = item.data.type === "melee";
+    let weaponBonus = item.system.precisionBonus;
+    const isMelee = item.system.type === "melee";
 
     const features = this.items.filter(i => i.type === "feature");
     for (const feature of features) {
-      const bonus = Number(isMelee ? feature.data.data.passive.meleePrecisionBonus : feature.data.data.passive.rangedPrecisionBonus);
-      const level = Number(feature.data.data.level);
+      console.log(feature);
+      const bonus = Number(isMelee ? feature.system.passive.meleePrecisionBonus : feature.system.passive.rangedPrecisionBonus);
+      const level = Number(feature.system.level);
       if (isNaN(bonus) || isNaN(level)) continue;
       if (!this.checkFeatureCondition(feature)) continue;
 
       weaponBonus += (bonus * level);
     }
 
-    let base = "【" + item.data.firstAbility.toUpperCase() + " + " + item.data.secondAbility.toUpperCase() + "】"; 
+    let base = "【" + item.system.firstAbility.toUpperCase() + " + " + item.system.secondAbility.toUpperCase() + "】"; 
     if (weaponBonus !== 0) {
       base += " + " + weaponBonus;
     }
@@ -333,9 +334,9 @@ export class FabulaUltimaActor extends Actor {
   }
 
   getArmorFormula(item, magic) {
-    let base = item.data.defenseFormula;
+    let base = item.system.defenseFormula;
     if (magic)
-      base = item.data.magicDefenseFormula;
+      base = item.system.magicDefenseFormula;
 
     if (base.includes("@")) {
       for (const ability in CONFIG.FABULAULTIMA.abilities) {
@@ -372,16 +373,16 @@ export class FabulaUltimaActor extends Actor {
   }
 
   checkFeatureCondition(feature) {
-    if (!feature.data.data.passive.condition || feature.data.data.passive.condition === "")
+    if (!feature.system.passive.condition || feature.system.passive.condition === "")
       return true;
 
-    if (feature.data.data.passive.condition === "crisis")
+    if (feature.system.passive.condition === "crisis")
       return this.isCrisis();
-    if (feature.data.data.passive.condition === "fullhealth")
+    if (feature.system.passive.condition === "fullhealth")
       return this.system.health.value === this.system.health.max;
 
-    if (feature.data.data.passive.condition.includes("effect:")) {
-      const effect = feature.data.data.passive.condition.split(":")[1];
+    if (feature.system.passive.condition.includes("effect:")) {
+      const effect = feature.system.passive.condition.split(":")[1];
       if (effect && effect !== "")
         return this.effects.some(e => e.name === effect || e.data.label === effect);
     }
@@ -447,7 +448,7 @@ export class FabulaUltimaActor extends Actor {
    * Prepare character roll data.
    */
   _getCharacterRollData(data) {
-    if (this.data.type !== 'character') return;
+    if (this.system.type !== 'character') return;
 
     // Copy the ability scores to the top level, so that rolls can use
     // formulas like `@str.mod + 4`.
@@ -467,7 +468,7 @@ export class FabulaUltimaActor extends Actor {
    * Prepare NPC roll data.
    */
   _getNpcRollData(data) {
-    if (this.data.type !== 'npc') return;
+    if (this.system.type !== 'npc') return;
 
     // Process additional NPC data here.
   }

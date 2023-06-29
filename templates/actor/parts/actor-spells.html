@@ -27,10 +27,10 @@
           <h4>{{spell.name}}</h4>
         </div>
         <div class="item-name">
-          {{#if (eq spell.data.cost.amount 0)}}
+          {{#if (eq spell.cost.amount 0)}}
             {{localize "FABULAULTIMA.None"}}
           {{else}}
-            {{spell.data.cost.amount}} {{spell.data.cost.resource}}
+            {{spell.cost.amount}} {{spell.cost.resource}}
           {{/if}}
         </div>
         <div class="item-controls">
